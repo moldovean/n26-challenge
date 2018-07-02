@@ -13,7 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.List;
+import java.util.Collection;
 
 @Path("/")
 public class N26EndPoints {
@@ -52,8 +52,8 @@ public class N26EndPoints {
 
     @GET
     @Path("iaka")
-    public List<TransactionItem> getTransactionItems() {
-        return statisticsService.getTransactionItems();
+    public Collection<TransactionItem> getTransactionItems() {
+        return statisticsService.getTransactionItems().values();
     }
 
 }

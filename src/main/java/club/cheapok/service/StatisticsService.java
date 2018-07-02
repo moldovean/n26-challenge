@@ -5,34 +5,33 @@ import club.cheapok.model.TransactionItem;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import java.util.ArrayList;
-import java.util.DoubleSummaryStatistics;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ApplicationScoped
 public class StatisticsService {
-    private final List<TransactionItem> transactionItems = new ArrayList<>();
+    private final Map<UUID,TransactionItem> transactionItems = new ConcurrentHashMap<>();
     private BasicStatistics basicStatistics = BasicStatistics.EMPTY;
 
-    public List<TransactionItem> getTransactionItems() {
+    public Map<UUID, TransactionItem> getTransactionItems() {
         return transactionItems;
     }
 
     public void insertTransactionItem(TransactionItem transactionItem) {
-        transactionItems.add(transactionItem);
+        transactionItems.put(transactionItem.getUuid(), transactionItem);
         // a bunch of ifs rather than
         calculateBasicStats();
     }
 
     public void removeTranscationItem(TransactionItem transactionItem) {
-        if (transactionItems.remove(transactionItem)) {
+        if (transactionItems.remove(transactionItem.getUuid(), transactionItem)) {
             calculateBasicStats();
         }
     }
 
     @PostConstruct
     public void calculateBasicStats() {
-        final DoubleSummaryStatistics doubleSummaryStatistics = transactionItems
+        final DoubleSummaryStatistics doubleSummaryStatistics = transactionItems.values()
                 .parallelStream()
                 .mapToDouble(TransactionItem::getAmount)
                 .summaryStatistics();
